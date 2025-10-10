@@ -7,7 +7,7 @@ type BaseError struct {
 	Msg      string
 }
 
-func (err *BaseError) Error() string {
+func (err BaseError) Error() string {
 	return fmt.Sprintf("(%s): %s", err.Resource, err.Msg)
 }
 
