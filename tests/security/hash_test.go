@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func GenHashSuccess(t *testing.T) {
+func TestGenHashSuccess(t *testing.T) {
 	passwd := mocks.GenFakePassword()
 	hash, err := security.GenHash(passwd)
 
