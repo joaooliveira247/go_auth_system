@@ -54,3 +54,17 @@ func TestCheckPasswordFailInvalidHash(t *testing.T) {
 		err.Error(),
 	)
 }
+func TestCheckPasswordFailInvalidHashTooShort(t *testing.T) {
+	passwd := mocks.GenFakePassword()
+
+	hash := "378cbde42599fa80815475968e903bd0"
+
+	err := security.CheckPassword(hash, passwd)
+
+	assert.Error(t, err)
+	assert.Equal(
+		t,
+		"(Hash): crypto/bcrypt: hashedSecret too short to be a bcrypted password",
+		err.Error(),
+	)
+}
