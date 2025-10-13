@@ -14,3 +14,10 @@ func GenHash(passwd string) (string, error) {
 
 	return string(hash), nil
 }
+
+func CheckPassword(hash, passwd string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(passwd)); err != nil {
+		return errors.NewHashError(err)
+	}
+	return nil
+}
