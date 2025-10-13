@@ -40,3 +40,17 @@ func TestCheckPasswordFailInvalidPassword(t *testing.T) {
 		err.Error(),
 	)
 }
+func TestCheckPasswordFailInvalidHash(t *testing.T) {
+	passwd := mocks.GenFakePassword()
+
+	hash, _ := security.GenHash("Abcd@1234")
+
+	err := security.CheckPassword(hash, passwd)
+
+	assert.Error(t, err)
+	assert.Equal(
+		t,
+		"(Hash): crypto/bcrypt: hashedPassword is not the hash of the given password",
+		err.Error(),
+	)
+}
