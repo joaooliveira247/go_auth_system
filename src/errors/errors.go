@@ -17,3 +17,10 @@ func NewDatabaseError(err error) BaseError {
 		Msg:      err.Error(),
 	}
 }
+
+func NewHashError(err error) BaseError {
+	return BaseError{
+		Resource: "Hash",
+		Msg:      err.Error(),
+	}
+}
