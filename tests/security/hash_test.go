@@ -15,3 +15,13 @@ func TestGenHashSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, hash, 60)
 }
+
+func TestCheckPasswordSuccess(t *testing.T) {
+	passwd := mocks.GenFakePassword()
+
+	hash, _ := security.GenHash(passwd)
+
+	err := security.CheckPassword(hash, passwd)
+
+	assert.NoError(t, err)
+}
