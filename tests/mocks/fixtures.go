@@ -1,8 +1,9 @@
 package mocks
 
-import "github.com/jaswdr/faker"
+import (
+	"github.com/go-faker/faker/v4"
+)
 
 func GenFakePassword() string {
-	fake := faker.New()
-	return fake.Internet().Password()
+	return faker.Password()
 }
