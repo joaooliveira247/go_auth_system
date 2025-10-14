@@ -12,3 +12,7 @@ type UserModel struct {
 	CreatedAt int64     `gorm:"autoCreateTime;type:timestamp;column:created_at"`
 	UpdatedAt int64     `gorm:"autoUpdateTime;type:timestamp;column:updated_at"`
 }
+
+func (UserModel) TableName() string {
+	return "users"
+}
