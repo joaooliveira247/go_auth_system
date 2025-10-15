@@ -5,10 +5,13 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/google/uuid"
+	"github.com/joaooliveira247/go_auth_system/src/errors"
 	"github.com/joaooliveira247/go_auth_system/src/models"
 	"github.com/joaooliveira247/go_auth_system/src/repositories"
 	"github.com/joaooliveira247/go_auth_system/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestCreateUserSuccess(t *testing.T) {
@@ -37,4 +40,57 @@ func TestCreateUserSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, mockUser.ID, id)
 	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestCreateUserFail(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	testCases := []struct {
+		testName          string
+		err               error
+		errStringExpected string
+	}{
+		{
+			testName:          "UserAlreadyExist",
+			err:               gorm.ErrDuplicatedKey,
+			errStringExpected: "(Database): duplicated key not allowed",
+		},
+		{
+			testName:          "UnmappedError",
+			err:               errors.ErrNotExpected,
+			errStringExpected: "(Database): NotExpectedTestError",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			mockUser := mocks.GenFakeUser()
+
+			repository := repositories.NewUserRepository(gormDB)
+
+			mock.ExpectBegin()
+			mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users" ("email","password","role","created_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id"`)).
+				WithArgs(mockUser.Email, mockUser.Password, mockUser.Role, mockUser.CreatedAt, mockUser.UpdatedAt).
+				WillReturnError(testCase.err)
+
+			mock.ExpectRollback()
+
+			id, err := repository.Create(
+				&models.UserModel{
+					Email:    mockUser.Email,
+					Password: mockUser.Password,
+				},
+			)
+
+			assert.Error(t, err)
+			assert.Equal(t, uuid.Nil, id)
+			assert.Equal(t, err.Error(), testCase.errStringExpected)
+
+		})
+	}
 }
