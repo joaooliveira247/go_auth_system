@@ -1,11 +1,16 @@
 package errors
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type BaseError struct {
 	Resource string
 	Msg      string
 }
+
+var ErrNotExpected = errors.New("NotExpectedTestError")
 
 func (err BaseError) Error() string {
 	return fmt.Sprintf("(%s): %s", err.Resource, err.Msg)
