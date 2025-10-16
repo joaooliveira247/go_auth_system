@@ -94,3 +94,31 @@ func TestCreateUserFail(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUserByEmail(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	row := mock.NewRows([]string{"id", "email", "password", "role", "created_at", "updated_at"}).
+		AddRow(mockUser.ID, mockUser.Email, mockUser.Password, mockUser.Role, mockUser.CreatedAt, mockUser.UpdatedAt)
+
+	repository := repositories.NewUserRepository(gormDB)
+
+	mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "users" WHERE email = $1 ORDER BY "users"."id" LIMIT $2`,
+		),
+	).WithArgs(mockUser.Email, 1).WillReturnRows(row)
+
+	result, err := repository.GetUserByEmail(mockUser.Email)
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, mockUser, &result)
+}
