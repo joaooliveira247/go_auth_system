@@ -9,6 +9,7 @@ import (
 
 type UserRepository interface {
 	Create(user *models.UserModel) (uuid.UUID, error)
+	GetUserByEmail(email string) (models.UserModel, error)
 }
 
 type userRepository struct {
