@@ -30,3 +30,15 @@ func (repository *userRepository) Create(
 
 	return user.ID, nil
 }
+
+func (repository *userRepository) GetUserByEmail(
+	email string,
+) (models.UserModel, error) {
+	var user models.UserModel
+
+	if result := repository.db.First(&user, "email = ?", email); result.Error != nil {
+		return models.UserModel{}, errors.NewDatabaseError(result.Error)
+	}
+
+	return user, nil
+}
