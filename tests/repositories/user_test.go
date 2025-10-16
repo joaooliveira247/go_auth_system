@@ -95,7 +95,7 @@ func TestCreateUserFail(t *testing.T) {
 	}
 }
 
-func TestGetUserByEmail(t *testing.T) {
+func TestGetUserByEmailSuccess(t *testing.T) {
 	gormDB, mock := mocks.SetupMockDB()
 
 	defer func() {
