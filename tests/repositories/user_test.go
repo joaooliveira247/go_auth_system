@@ -94,3 +94,78 @@ func TestCreateUserFail(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUserByEmailSuccess(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	row := mock.NewRows([]string{"id", "email", "password", "role", "created_at", "updated_at"}).
+		AddRow(mockUser.ID, mockUser.Email, mockUser.Password, mockUser.Role, mockUser.CreatedAt, mockUser.UpdatedAt)
+
+	repository := repositories.NewUserRepository(gormDB)
+
+	mock.ExpectQuery(
+		regexp.QuoteMeta(
+			`SELECT * FROM "users" WHERE email = $1 ORDER BY "users"."id" LIMIT $2`,
+		),
+	).WithArgs(mockUser.Email, 1).WillReturnRows(row)
+
+	result, err := repository.GetUserByEmail(mockUser.Email)
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, mockUser, &result)
+}
+
+func TestGetUserByEmailFail(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	testCases := []struct {
+		testName          string
+		err               error
+		errStringExpected string
+	}{
+		{
+			testName:          "RecordNotfound",
+			err:               gorm.ErrRecordNotFound,
+			errStringExpected: "(Database): record not found",
+		},
+		{
+			testName:          "UnmappedError",
+			err:               errors.ErrNotExpected,
+			errStringExpected: "(Database): NotExpectedTestError",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			repository := repositories.NewUserRepository(gormDB)
+
+			mock.ExpectQuery(
+				regexp.QuoteMeta(
+					`SELECT * FROM "users" WHERE email = $1 ORDER BY "users"."id" LIMIT $2`,
+				),
+			).WithArgs(mockUser.Email, 1).WillReturnError(testCase.err)
+
+			result, err := repository.GetUserByEmail(mockUser.Email)
+
+			assert.Empty(t, result)
+			assert.Error(t, err)
+			assert.ErrorIs(t, err, errors.NewDatabaseError(testCase.err))
+			assert.Equal(t, testCase.errStringExpected, err.Error())
+		})
+	}
+}
