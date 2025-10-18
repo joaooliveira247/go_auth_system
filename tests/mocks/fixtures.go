@@ -47,3 +47,8 @@ func GenFakeUser() *models.UserModel {
 		UpdatedAt: time.Now().Unix(),
 	}
 }
+
+func GenHashedPassword() string {
+	hashedPassword, _ := security.GenHash(GenFakePassword())
+	return hashedPassword
+}
