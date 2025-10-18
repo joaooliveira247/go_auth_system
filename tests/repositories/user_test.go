@@ -169,3 +169,32 @@ func TestGetUserByEmailFail(t *testing.T) {
 		})
 	}
 }
+
+func TestChangeUserPasswordSuccess(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+	mockNewPassword := mocks.GenHashedPassword()
+
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta(
+		`UPDATE "users" SET "password"=$1,"updated_at"=$2 WHERE id = $3`,
+	)).
+		WithArgs(
+			mockNewPassword,
+			sqlmock.AnyArg(),
+			mockUser.ID,
+		).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	repository := repositories.NewUserRepository(gormDB)
+	err := repository.ChangeUserPassword(mockUser.ID, mockNewPassword)
+
+	assert.NoError(t, err)
+}
