@@ -198,3 +198,54 @@ func TestChangeUserPasswordSuccess(t *testing.T) {
 
 	assert.NoError(t, err)
 }
+
+func TestChangeUserPasswordFail(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+	mockNewPassword := mocks.GenHashedPassword()
+
+	testCases := []struct {
+		testName          string
+		err               error
+		errStringExpected string
+	}{
+		{
+			testName:          "NothingToUpdate",
+			err:               errors.ErrNothingToUpdate,
+			errStringExpected: "(Database): NothingToUpdate",
+		},
+		{
+			testName:          "UnmappedError",
+			err:               errors.ErrNotExpected,
+			errStringExpected: "(Database): NotExpectedTestError",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			mock.ExpectBegin()
+			mock.ExpectExec(regexp.QuoteMeta(
+				`UPDATE "users" SET "password"=$1,"updated_at"=$2 WHERE id = $3`,
+			)).
+				WithArgs(
+					mockNewPassword,
+					sqlmock.AnyArg(),
+					mockUser.ID,
+				).
+				WillReturnError(testCase.err)
+			mock.ExpectRollback()
+
+			repository := repositories.NewUserRepository(gormDB)
+			err := repository.ChangeUserPassword(mockUser.ID, mockNewPassword)
+
+			assert.Error(t, err)
+			assert.Equal(t, testCase.errStringExpected, err.Error())
+		})
+	}
+}
