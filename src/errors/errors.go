@@ -10,7 +10,10 @@ type BaseError struct {
 	Msg      string
 }
 
-var ErrNotExpected = errors.New("NotExpectedTestError")
+var (
+	ErrNotExpected     = errors.New("NotExpectedTestError")
+	ErrNothingToUpdate = errors.New("NothingToUpdate")
+)
 
 func (err BaseError) Error() string {
 	return fmt.Sprintf("(%s): %s", err.Resource, err.Msg)
