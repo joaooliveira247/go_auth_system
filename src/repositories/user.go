@@ -43,3 +43,23 @@ func (repository *userRepository) GetUserByEmail(
 
 	return user, nil
 }
+
+func (repository *userRepository) ChangeUserPassword(
+	id uuid.UUID,
+	password string,
+) error {
+
+	result := repository.db.Model(&models.UserModel{}).
+		Where("id = ?", id).
+		Update("password", password)
+
+	if result.Error != nil {
+		return errors.NewDatabaseError(result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.NewDatabaseError(errors.ErrNothingToUpdate)
+	}
+
+	return nil
+}
