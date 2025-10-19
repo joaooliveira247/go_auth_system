@@ -64,3 +64,17 @@ func (repository *userRepository) ChangeUserPassword(
 
 	return nil
 }
+
+func (repository *userRepository) Delete(id uuid.UUID) error {
+	result := repository.db.Delete(models.UserModel{}, id)
+
+	if err := result.Error; err != nil {
+		return errors.NewDatabaseError(err)
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.NewDatabaseError(errors.ErrNothingToDelete)
+	}
+
+	return nil
+}
