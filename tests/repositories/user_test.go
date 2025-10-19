@@ -249,3 +249,71 @@ func TestChangeUserPasswordFail(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUserSuccess(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "users" WHERE "users"."id" = $1`)).
+		WithArgs(mockUser.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	repository := repositories.NewUserRepository(gormDB)
+
+	err := repository.Delete(mockUser.ID)
+
+	assert.NoError(t, err)
+}
+
+func TestDeleteUserFail(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	testCases := []struct {
+		testName          string
+		err               error
+		errStringExpected string
+	}{
+		{
+			testName:          "NothingToDelete",
+			err:               errors.ErrNothingToDelete,
+			errStringExpected: "(Database): NothingToDelete",
+		},
+		{
+			testName:          "UnmappedError",
+			err:               errors.ErrNotExpected,
+			errStringExpected: "(Database): NotExpectedTestError",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.testName, func(t *testing.T) {
+			mock.ExpectBegin()
+			mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "users" WHERE "users"."id" = $1`)).
+				WithArgs(mockUser.ID).
+				WillReturnError(testCase.err)
+			mock.ExpectRollback()
+
+			repository := repositories.NewUserRepository(gormDB)
+
+			err := repository.Delete(mockUser.ID)
+
+			assert.Error(t, err)
+			assert.Equal(t, testCase.errStringExpected, err.Error())
+		})
+	}
+}
