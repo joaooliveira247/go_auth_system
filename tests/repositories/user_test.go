@@ -249,3 +249,26 @@ func TestChangeUserPasswordFail(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUserSuccess(t *testing.T) {
+	gormDB, mock := mocks.SetupMockDB()
+
+	defer func() {
+		db, _ := gormDB.DB()
+		db.Close()
+	}()
+
+	mockUser := mocks.GenFakeUser()
+
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "users" WHERE "users"."id" = $1`)).
+		WithArgs(mockUser.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	repository := repositories.NewUserRepository(gormDB)
+
+	err := repository.Delete(mockUser.ID)
+
+	assert.NoError(t, err)
+}
