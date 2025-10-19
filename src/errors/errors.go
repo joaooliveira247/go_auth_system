@@ -13,6 +13,7 @@ type BaseError struct {
 var (
 	ErrNotExpected     = errors.New("NotExpectedTestError")
 	ErrNothingToUpdate = errors.New("NothingToUpdate")
+	ErrNothingToDelete = errors.New("NothingToDelete")
 )
 
 func (err BaseError) Error() string {
