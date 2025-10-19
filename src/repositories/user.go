@@ -11,6 +11,7 @@ type UserRepository interface {
 	Create(user *models.UserModel) (uuid.UUID, error)
 	GetUserByEmail(email string) (models.UserModel, error)
 	ChangeUserPassword(id uuid.UUID, password string) error
+	Delete(id uuid.UUID) error
 }
 
 type userRepository struct {
