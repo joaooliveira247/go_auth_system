@@ -22,7 +22,7 @@ func TestCreateUserSuccess(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 
 	repository := repositories.NewUserRepository(gormDB)
 
@@ -69,7 +69,7 @@ func TestCreateUserFail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
-			mockUser := mocks.GenFakeUser()
+			mockUser := mocks.GenFakeUserModel()
 
 			repository := repositories.NewUserRepository(gormDB)
 
@@ -103,7 +103,7 @@ func TestGetUserByEmailSuccess(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 
 	row := mock.NewRows([]string{"id", "email", "password", "role", "created_at", "updated_at"}).
 		AddRow(mockUser.ID, mockUser.Email, mockUser.Password, mockUser.Role, mockUser.CreatedAt, mockUser.UpdatedAt)
@@ -131,7 +131,7 @@ func TestGetUserByEmailFail(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 
 	testCases := []struct {
 		testName          string
@@ -178,7 +178,7 @@ func TestChangeUserPasswordSuccess(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 	mockNewPassword := mocks.GenHashedPassword()
 
 	mock.ExpectBegin()
@@ -207,7 +207,7 @@ func TestChangeUserPasswordFail(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 	mockNewPassword := mocks.GenHashedPassword()
 
 	testCases := []struct {
@@ -258,7 +258,7 @@ func TestDeleteUserSuccess(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 
 	mock.ExpectBegin()
 	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "users" WHERE "users"."id" = $1`)).
@@ -281,7 +281,7 @@ func TestDeleteUserFail(t *testing.T) {
 		db.Close()
 	}()
 
-	mockUser := mocks.GenFakeUser()
+	mockUser := mocks.GenFakeUserModel()
 
 	testCases := []struct {
 		testName          string

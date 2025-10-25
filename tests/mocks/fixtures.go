@@ -36,7 +36,7 @@ func GenFakePassword() string {
 	return faker.Password()
 }
 
-func GenFakeUser() *models.UserModel {
+func GenFakeUserModel() *models.UserModel {
 	hashedPassword, _ := security.GenHash(faker.Password())
 	return &models.UserModel{
 		ID:        uuid.New(),
