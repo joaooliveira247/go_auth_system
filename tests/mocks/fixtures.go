@@ -8,6 +8,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/google/uuid"
 	"github.com/joaooliveira247/go_auth_system/src/models"
+	"github.com/joaooliveira247/go_auth_system/src/schemas"
 	"github.com/joaooliveira247/go_auth_system/src/security"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -45,6 +46,15 @@ func GenFakeUserModel() *models.UserModel {
 		Role:      "user",
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
+	}
+}
+
+func GenFakeUserSchemaIn() *schemas.UserSchemaIn {
+	password := GenFakePassword()
+	return &schemas.UserSchemaIn{
+		Email:           faker.Email(),
+		Password:        password,
+		ConfirmPassword: password,
 	}
 }
 
