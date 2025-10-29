@@ -33,3 +33,9 @@ func NewHashError(err error) BaseError {
 		Msg:      err.Error(),
 	}
 }
+
+func NewModelError(err error) BaseError {
+	return BaseError{
+		Resource: "Model", Msg: err.Error(),
+	}
+}
