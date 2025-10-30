@@ -39,3 +39,10 @@ func NewModelError(err error) BaseError {
 		Resource: "Model", Msg: err.Error(),
 	}
 }
+
+func NewTokenSignUpError(err error) BaseError {
+	return BaseError{
+		Resource: "SignUp Token",
+		Msg:      err.Error(),
+	}
+}
