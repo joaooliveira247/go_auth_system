@@ -6,10 +6,12 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-faker/faker/v4"
+	"github.com/go-redis/redismock/v9"
 	"github.com/google/uuid"
 	"github.com/joaooliveira247/go_auth_system/src/models"
 	"github.com/joaooliveira247/go_auth_system/src/schemas"
 	"github.com/joaooliveira247/go_auth_system/src/security"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -31,6 +33,10 @@ func SetupMockDB() (*gorm.DB, sqlmock.Sqlmock) {
 	}
 
 	return gormDB, mock
+}
+
+func SetupMockCache() (*redis.Client, redismock.ClientMock) {
+	return redismock.NewClientMock()
 }
 
 func GenFakePassword() string {
