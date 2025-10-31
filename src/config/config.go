@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
 var (
-	DBURL = ""
+	DBURL         = ""
+	CacheUrl      = ""
+	CacheDuration = 7200
 )
 
 func LoadEnv() {
@@ -28,4 +31,11 @@ func LoadEnv() {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_SSL"),
 	)
+
+	CacheUrl = os.Getenv("CACHE_URL")
+	CacheDuration, err = strconv.Atoi(os.Getenv("CACHE_DURATION"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }

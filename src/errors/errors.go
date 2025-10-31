@@ -46,3 +46,7 @@ func NewTokenSignUpError(err error) BaseError {
 		Msg:      err.Error(),
 	}
 }
+
+func NewCacheError(err error) BaseError {
+	return BaseError{Resource: "Cache", Msg: err.Error()}
+}
