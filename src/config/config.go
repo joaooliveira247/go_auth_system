@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	DBURL = ""
+	DBURL    = ""
+	CacheUrl = ""
 )
 
 func LoadEnv() {
@@ -28,4 +29,6 @@ func LoadEnv() {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_SSL"),
 	)
+
+	CacheUrl = os.Getenv("CACHE_URL")
 }
