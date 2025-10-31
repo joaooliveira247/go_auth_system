@@ -8,3 +8,7 @@ type Cache interface {
 type redisCache struct {
 	client *redis.Client
 }
+
+func NewCache(client *redis.Client) Cache {
+	return &redisCache{client}
+}
